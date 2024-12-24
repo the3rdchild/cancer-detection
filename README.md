@@ -15,7 +15,7 @@
 ## Bagian Software
 ### Machine Learning untuk Deteksi:
 - Mengembangkan model deteksi kanker kulit menggunakan dataset gambar yang relevan.
-- Melatih model dengan algoritma seperti CNN untuk identifikasi area kanker.
+- Melatih model dengan algoritma CNN YOLO v11 untuk deteksi kanker kulit.
 - Mengintegrasikan model dengan kamera robot untuk mendeteksi secara real-time.
 
 ### Pengambilan dan Penyimpanan Gambar:
