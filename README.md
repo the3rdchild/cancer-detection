@@ -6,7 +6,7 @@
 - Merakit komponen mekanik, seperti penyangga, tekukan, dan pergelangan.
 - Memastikan stabilitas dan fleksibilitas gerakan robot.
 
-### Kontrol Servo (PID):
+### Kontrol Servo:
 - Menulis kode kontrol untuk mengatur gerakan servo sesuai perintah.
 - Mengintegrasikan feedback loop untuk meningkatkan presisi gerakan.
 - Menyediakan fitur kalibrasi awal untuk posisi netral.
