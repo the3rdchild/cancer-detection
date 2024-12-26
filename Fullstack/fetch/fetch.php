@@ -1,12 +1,15 @@
 <?php
 require_once '../app/database.php';
 
+// Enable Cross-Origin Resource Sharing (CORS) if needed
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
+// Connect to the database
 $db = Database::connect();
 
 try {
+    // Fetch the latest detection data
     $sql = "SELECT 
                 session_id, 
                 height_location, 
@@ -22,13 +25,21 @@ try {
     $stmt->execute();
     $latestDetection = $stmt->fetch();
 
-    $cameraFeed = 'http://localhost:8080/video_feed'; 
+    // Add camera feed URL
+    $cameraFeed = 'http://localhost:8080/video_feed'; // Replace with actual camera feed URL or logic
 
+    // Fetch previously detected images from the "Machine Learning/Result/Image" directory
+    $imageDir = '../Machine Learning/Result/image'; // Path to the image folder
+    $images = array_diff(scandir($imageDir), array('..', '.')); // Remove '.' and '..' entries
+
+    // Combine data for the browser
     $response = [
         'camera_feed' => $cameraFeed,
-        'latest_detection' => $latestDetection
+        'latest_detection' => $latestDetection,
+        'previous_images' => $images // List of previously detected images
     ];
 
+    // Output as JSON
     echo json_encode($response);
 } catch (Exception $e) {
     error_log($e->getMessage(), 3, '../app/logs/database_error.log');
