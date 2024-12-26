@@ -55,16 +55,15 @@
         .previous-images {
             margin-top: 20px;
             width: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
         }
-        .previous-images img {
-            width: 150px;
-            height: 150px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
+        .previous-images a {
+            font-size: 16px;
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .previous-images a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -93,7 +92,8 @@
 
         <div class="previous-images" id="previous-images">
             <h2>Previous Detected Images</h2>
-            <!-- Images will be loaded here dynamically -->
+            <!-- Provide a link to the image.html page -->
+            <a href="image.html">View Previous Detected Images</a>
         </div>
     </div>
 
@@ -103,6 +103,8 @@
             try {
                 const response = await fetch('fetch/fetch.php');
                 const data = await response.json();
+
+                console.log(data); // Debug: Check the structure of the response
 
                 // Update the camera feed
                 const cameraFeed = document.getElementById('camera-feed');
@@ -116,17 +118,6 @@
                 document.getElementById('confidence').textContent = data.latest_detection.confidence;
                 document.getElementById('detection-status').textContent = data.latest_detection.detection_status;
                 document.getElementById('detection-image').src = data.latest_detection.image_path;
-
-                // Display previous images
-                const previousImagesContainer = document.getElementById('previous-images');
-                previousImagesContainer.innerHTML = ''; // Clear previous images first
-                data.previous_images.forEach(image => {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = `../Machine Learning/Result/image/${image}`;
-                    imgElement.alt = 'Previous Detection Image';
-                    imgElement.title = image;
-                    previousImagesContainer.appendChild(imgElement);
-                });
             } catch (error) {
                 console.error('Failed to fetch data:', error);
             }

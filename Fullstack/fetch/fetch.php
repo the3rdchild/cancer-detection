@@ -1,15 +1,12 @@
 <?php
 require_once '../app/database.php';
-
-// Enable Cross-Origin Resource Sharing (CORS) if needed
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
-// Connect to the database
 $db = Database::connect();
 
 try {
-    // Fetch the latest detection data
+    // Fetch the latest detection from the database
     $sql = "SELECT 
                 session_id, 
                 height_location, 
@@ -21,26 +18,46 @@ try {
             FROM detection_results 
             ORDER BY detection_time DESC 
             LIMIT 1";
+    
     $stmt = $db->prepare($sql);
     $stmt->execute();
     $latestDetection = $stmt->fetch();
 
-    // Add camera feed URL
-    $cameraFeed = 'http://localhost:8080/video_feed'; // Replace with actual camera feed URL or logic
+    // Access the image directory
+    $imageDir = realpath(dirname(__FILE__) . '/../..' . '/Machine Learning/Result/image');
+    
+    // Check if the directory exists
+    if ($imageDir && is_dir($imageDir)) {
+        $images = array_diff(scandir($imageDir), array('..', '.'));
+        
+        // Sort images by file modification time
+        usort($images, function ($a, $b) use ($imageDir) {
+            return filemtime($imageDir . '/' . $b) - filemtime($imageDir . '/' . $a);
+        });
+        
+        // Get the latest image
+        $latestImage = reset($images);
+        $latestImagePath = $latestImage ? "Machine Learning/Result/image/" . $latestImage : 'No images found'; 
+        // D:/Program Files/xampp/htdocs/cancer-detection/Machine Learning/Result/image
+        } else {
+        $latestImagePath = 'Error accessing image directory';
+    }
 
-    // Fetch previously detected images from the "Machine Learning/Result/Image" directory
-    $imageDir = '../Machine Learning/Result/image'; // Path to the image folder
-    $images = array_diff(scandir($imageDir), array('..', '.')); // Remove '.' and '..' entries
-
-    // Combine data for the browser
+    // Generate a list of all images
+    $imageList = array_map(function ($image) use ($imageDir) {
+        return "http://localhost/cancer-detection/Machine%20Learning/Result/image/" . $image;
+    }, array_diff(scandir($imageDir), array('..', '.')));
+    
+    // Send JSON response
     $response = [
-        'camera_feed' => $cameraFeed,
-        'latest_detection' => $latestDetection,
-        'previous_images' => $images // List of previously detected images
+        'camera_feed' => 'http://localhost:8080/video_feed', 
+        'latest_detection' => $latestDetection ? $latestDetection : 'No recent detection',
+        'latest_image' => $latestImagePath,
+        'image_list' => $imageList
     ];
 
-    // Output as JSON
     echo json_encode($response);
+
 } catch (Exception $e) {
     error_log($e->getMessage(), 3, '../app/logs/database_error.log');
     http_response_code(500);
