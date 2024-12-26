@@ -5,12 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CANCER DETECTION MAIN CONTROL</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007BFF;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .camera-container {
+            margin-bottom: 20px;
+        }
+        .camera-container video {
+            width: 80%;
+            max-width: 800px;
+            border: 2px solid #ccc;
+        }
+        .detection-info {
+            width: 80%;
+            max-width: 800px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .detection-info img {
+            width: 100%;
+            max-width: 300px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+        .detection-info p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+    </style>
 </head>
 
-  
 <body>
-  
-  //logika
-  
+    <header>
+        <h1>Cancer Detection Control Panel</h1>
+    </header>
+
+    <div class="container">
+        <div class="camera-container">
+            <h2>Real-time Camera Feed</h2>
+            <video id="camera-feed" autoplay></video> <!-- Placeholder for live video feed -->
+        </div>
+
+        <div class="detection-info" id="detection-data">
+            <h2>Latest Detection Results</h2>
+            <p><strong>Session ID:</strong> <span id="session-id"></span></p>
+            <p><strong>Height Location:</strong> <span id="height-location"></span></p>
+            <p><strong>Detection Time:</strong> <span id="detection-time"></span></p>
+            <p><strong>Cancer Type:</strong> <span id="cancer-type"></span></p>
+            <p><strong>Confidence:</strong> <span id="confidence"></span></p>
+            <p><strong>Status:</strong> <span id="detection-status"></span></p>
+            <img id="detection-image" alt="Detection Image">
+        </div>
+    </div>
+
+    <script>
+        // Fetch data from fetch.php and update the interface
+        async function fetchData() {
+            try {
+                const response = await fetch('fetch/fetch.php');
+                const data = await response.json();
+
+                // Update the camera feed
+                const cameraFeed = document.getElementById('camera-feed');
+                cameraFeed.src = data.camera_feed;
+
+                // Update the detection data
+                document.getElementById('session-id').textContent = data.latest_detection.session_id;
+                document.getElementById('height-location').textContent = data.latest_detection.height_location;
+                document.getElementById('detection-time').textContent = data.latest_detection.detection_time;
+                document.getElementById('cancer-type').textContent = data.latest_detection.cancer_type;
+                document.getElementById('confidence').textContent = data.latest_detection.confidence;
+                document.getElementById('detection-status').textContent = data.latest_detection.detection_status;
+                document.getElementById('detection-image').src = data.latest_detection.image_path;
+            } catch (error) {
+                console.error('Failed to fetch data:', error);
+            }
+        }
+
+        // Fetch data every 2 seconds
+        setInterval(fetchData, 2000);
+    </script>
 </body>
 </html>
