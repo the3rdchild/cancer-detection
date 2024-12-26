@@ -34,5 +34,34 @@ class Database {
     public static function disconnect() {
         self::$cont = null;
     }
+
+    // Utility method to run queries safely
+    public static function query($sql, $params = []) {
+        $db = self::connect();
+        try {
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (PDOException $e) {
+            error_log($e->getMessage(), 3, __DIR__ . '/logs/database_error.log');
+            return false;
+        }
+    }
+
+    // Transaction support
+    public static function beginTransaction() {
+        $db = self::connect();
+        $db->beginTransaction();
+    }
+
+    public static function commitTransaction() {
+        $db = self::connect();
+        $db->commit();
+    }
+
+    public static function rollbackTransaction() {
+        $db = self::connect();
+        $db->rollBack();
+    }
 }
 ?>
