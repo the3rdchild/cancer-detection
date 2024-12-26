@@ -28,7 +28,7 @@
         .camera-container {
             margin-bottom: 20px;
         }
-        .camera-container video {
+        .camera-container img {
             width: 80%;
             max-width: 800px;
             border: 2px solid #ccc;
@@ -75,19 +75,19 @@
 
     <div class="container">
         <div class="camera-container">
-            <h2>Real-time Camera Feed</h2>
-            <video id="camera-feed" autoplay></video> <!-- Placeholder for live video feed -->
+            <h2>Real-time Preview</h2>
+            <img id="camera-feed" src="http://127.0.0.1:4000/preview" alt="Live Camera Feed">
         </div>
 
         <div class="detection-info" id="detection-data">
             <h2>Latest Detection Results</h2>
-            <p><strong>Session ID:</strong> <span id="session-id"></span></p>
-            <p><strong>Height Location:</strong> <span id="height-location"></span></p>
-            <p><strong>Detection Time:</strong> <span id="detection-time"></span></p>
-            <p><strong>Cancer Type:</strong> <span id="cancer-type"></span></p>
-            <p><strong>Confidence:</strong> <span id="confidence"></span></p>
-            <p><strong>Status:</strong> <span id="detection-status"></span></p>
-            <img id="detection-image" alt="Detection Image">
+            <p><strong>Session ID:</strong> <span id="session-id">N/A</span></p>
+            <p><strong>Height Location:</strong> <span id="height-location">N/A</span></p>
+            <p><strong>Detection Time:</strong> <span id="detection-time">N/A</span></p>
+            <p><strong>Cancer Type:</strong> <span id="cancer-type">N/A</span></p>
+            <p><strong>Confidence:</strong> <span id="confidence">N/A</span></p>
+            <p><strong>Status:</strong> <span id="detection-status">N/A</span></p>
+            <img id="detection-image" alt="Detection Image" src="">
         </div>
 
         <div class="previous-images" id="previous-images">
@@ -108,16 +108,30 @@
 
                 // Update the camera feed
                 const cameraFeed = document.getElementById('camera-feed');
-                cameraFeed.src = data.camera_feed;
+                cameraFeed.src = data.camera_feed;  // Directly update the camera feed URL
 
                 // Update the detection data
-                document.getElementById('session-id').textContent = data.latest_detection.session_id;
-                document.getElementById('height-location').textContent = data.latest_detection.height_location;
-                document.getElementById('detection-time').textContent = data.latest_detection.detection_time;
-                document.getElementById('cancer-type').textContent = data.latest_detection.cancer_type;
-                document.getElementById('confidence').textContent = data.latest_detection.confidence;
-                document.getElementById('detection-status').textContent = data.latest_detection.detection_status;
-                document.getElementById('detection-image').src = data.latest_detection.image_path;
+                const latestDetection = data.latest_detection;
+
+                if (latestDetection !== 'No recent detection') {
+                    document.getElementById('session-id').textContent = latestDetection.session_id || 'N/A';
+                    document.getElementById('height-location').textContent = latestDetection.height_location || 'N/A';
+                    document.getElementById('detection-time').textContent = latestDetection.detection_time || 'N/A';
+                    document.getElementById('cancer-type').textContent = latestDetection.cancer_type || 'N/A';
+                    document.getElementById('confidence').textContent = latestDetection.confidence || 'N/A';
+                    document.getElementById('detection-status').textContent = latestDetection.detection_status || 'N/A';
+                    document.getElementById('detection-image').src = latestDetection.image_path || '';
+                    document.getElementById('detection-image').alt = 'Latest detection image';
+                } else {
+                    document.getElementById('session-id').textContent = 'No Data';
+                    document.getElementById('height-location').textContent = 'No Data';
+                    document.getElementById('detection-time').textContent = 'No Data';
+                    document.getElementById('cancer-type').textContent = 'No Data';
+                    document.getElementById('confidence').textContent = 'No Data';
+                    document.getElementById('detection-status').textContent = 'No Data';
+                    document.getElementById('detection-image').src = '';
+                    document.getElementById('detection-image').alt = 'No detection image available';
+                }
             } catch (error) {
                 console.error('Failed to fetch data:', error);
             }

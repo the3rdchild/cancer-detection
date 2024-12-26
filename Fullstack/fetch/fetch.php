@@ -50,7 +50,7 @@ try {
     
     // Send JSON response
     $response = [
-        'camera_feed' => 'http://localhost:8080/video_feed', 
+        'camera_feed' => 'http://127.0.0.1:4000/preview', 
         'latest_detection' => $latestDetection ? $latestDetection : 'No recent detection',
         'latest_image' => $latestImagePath,
         'image_list' => $imageList
