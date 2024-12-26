@@ -1,32 +1,43 @@
+import os
 import cv2
 from ultralytics import YOLO
-import os
+from flask import Flask, Response
+from ..path import model_path
 
-home_directory = os.path.expanduser('~lokasidir')
-model_dir = os.path.join(home_directory, "model.pt" )
-model = YOLO(model_dir)
+app = Flask(__name__)
+model = YOLO(model_path)
 
-def predict(chosen_model, img, classes=[], conf=0.5):
-    if classes:
-        results = chosen_model.predict(img, classes=classes, conf=conf)
-    else:
-        results = chosen_model.predict(img, conf=conf)
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1920)
 
-    return results
+def generate_frames():
+    if not cap.isOpened():
+        print("Error: Camera not initialized.")
+        return
 
-def predict_and_detect(chosen_model, img, classes=[], conf=0.5, rectangle_thickness=2, text_thickness=1):
-    results = predict(chosen_model, img, classes, conf=conf)
-    for result in results:
-        for box in result.boxes:
-            cv2.rectangle(img, (int(box.xyxy[0][0]), int(box.xyxy[0][1])),
-                          (int(box.xyxy[0][2]), int(box.xyxy[0][3])), (255, 0, 0), rectangle_thickness)
-            cv2.putText(img, f"{result.names[int(box.cls[0])]}",
-                        (int(box.xyxy[0][0]), int(box.xyxy[0][1]) - 10),
-                        cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), text_thickness)
-    return img, results
-imagedir = os.path.join(home_directory, "image.png")
-image = cv2.imread(imagedir)
-result_img, _ = predict_and_detect(model, image, classes=[], conf=0.5)
-cv2.imshow("Image", result_img)
-cv2.imwrite("result.jpg", result_img)
-cv2.waitKey(1) & 0xFF == ord('q')
+    while True:
+        success, frame = cap.read()
+        if not success:
+            print("Error: Failed to read frame.")
+            break
+
+        results = model.track(frame, classes=0, conf=0.8, imgsz=640)
+        cv2.putText(frame, 
+                    f"Total: {len(results[0].boxes)}", 
+                    (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 
+                    1, (0, 0, 255), 
+                    1, cv2.LINE_AA)
+        ret, buffer = cv2.imencode('.jpg', results[0].plot())
+        frame = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+@app.route('/preview')
+def preview():
+    """Video feed route."""
+    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=4000, debug=False)
