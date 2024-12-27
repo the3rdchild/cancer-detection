@@ -201,5 +201,53 @@
         // Fetch data every 2 seconds
         setInterval(fetchData, 2000);
     </script>
+    <script>
+        async function fetchImageList() {
+            try {
+                const response = await fetch('../fetch/fetch.php'); // Adjusted path to match your structure
+                const data = await response.json();
+                const imageList = data.image_list;
+
+                if (imageList && Object.keys(imageList).length > 0) {
+                    const gallery = document.getElementById('gallery');
+                    gallery.innerHTML = ''; // Clear any existing content
+
+                    // Create image elements for each image link
+                    Object.values(imageList).forEach((imageUrl) => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = imageUrl; // Set the source to the image URL
+                        imgElement.alt = 'Detected Image';
+                        gallery.appendChild(imgElement);
+
+                        // Add click event to show the image in a modal
+                        imgElement.addEventListener('click', () => {
+                            const modal = document.getElementById('modal');
+                            const modalImage = document.getElementById('modalImage');
+                            modalImage.src = imageUrl; // Show clicked image in modal
+                            modal.classList.add('open');
+                        });
+                    });
+                } else {
+                    console.error('No images found in image list.');
+                }
+            } catch (error) {
+                console.error('Error fetching image list:', error);
+            }
+        }
+
+        // Close modal logic
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modal').classList.remove('open');
+        });
+
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modal')) {
+                document.getElementById('modal').classList.remove('open');
+            }
+        });
+
+        // Fetch and display images on page load
+        fetchImageList();
+    </script>
 </body>
 </html>
