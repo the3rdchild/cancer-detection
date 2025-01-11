@@ -10,6 +10,7 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             margin: 0;
+            justify-content: center;
             padding: 0;
         }
         header {
@@ -22,11 +23,13 @@
             width: 80%;
             margin: 20px auto;
             display: flex;
+            justify-content: center;
             flex-direction: column;
             align-items: center;
         }
         .camera-container {
             margin-bottom: 20px;
+            justify-content: center;
         }
         .camera-container img {
             width: 80%;
@@ -213,7 +216,8 @@
             <img id="detection_image" alt="Detection Image" src="">
         </div>
     </div>
-    
+    <div class="previous-images" id="previous-images">
+        <h2>Previous Detected Images</h2>
     <div class="gallery" id="gallery">
         <!-- Images will be dynamically added here -->
     </div>
