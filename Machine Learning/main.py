@@ -17,7 +17,7 @@ def generate_frames():
         return
 
     while True:
-        success, frame = cap.read()
+        success, frame = cap.reasd()
         if not success:
             print("Error: Failed to read frame.")
             break

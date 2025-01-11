@@ -45,7 +45,7 @@ try {
 
     // Generate a list of all images
     $imageList = array_map(function ($image) use ($imageDir) {
-        return "http://localhost/cancer-detection/Machine%20Learning/Result/image/" . $image;
+        return "http://localhost/cancer_detection/Machine%20Learning/Result/image/" . $image;
     }, array_diff(scandir($imageDir), array('..', '.')));
     
     // Send JSON response

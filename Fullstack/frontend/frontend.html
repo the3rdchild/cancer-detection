@@ -126,6 +126,68 @@
             font-size: 2rem;
             cursor: pointer;
         }
+        
+
+       
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 8px;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -142,63 +204,64 @@
 
         <div class="detection-info" id="detection-data">
             <h2>Latest Detection Results</h2>
-            <p><strong>Session ID:</strong> <span id="session-id">N/A</span></p>
-            <p><strong>Height Location:</strong> <span id="height-location">N/A</span></p>
-            <p><strong>Detection Time:</strong> <span id="detection-time">N/A</span></p>
-            <p><strong>Cancer Type:</strong> <span id="cancer-type">N/A</span></p>
+            <p><strong>Session ID:</strong> <span id="session_id">N/A</span></p>
+            <p><strong>Height Location:</strong> <span id="height_location">N/A</span></p>
+            <p><strong>Detection Time:</strong> <span id="detection_time">N/A</span></p>
+            <p><strong>Cancer Type:</strong> <span id="cancer_type">N/A</span></p>
             <p><strong>Confidence:</strong> <span id="confidence">N/A</span></p>
-            <p><strong>Status:</strong> <span id="detection-status">N/A</span></p>
-            <img id="detection-image" alt="Detection Image" src="">
+            <p><strong>Status:</strong> <span id="detection_status">N/A</span></p>
+            <img id="detection_image" alt="Detection Image" src="">
         </div>
+    </div>
+    
+    <div class="gallery" id="gallery">
+        <!-- Images will be dynamically added here -->
+    </div>
 
-        <div class="previous-images" id="previous-images">
-            <h2>Previous Detected Images</h2>
-        </div>
+    <div class="modal" id="modal">
+        <span class="close-btn" id="closeModal">&times;</span>
+        <img id="modalImage" src="" alt="Preview">
     </div>
 
     <script>
         async function fetchData() {
             try {
-                const response = await fetch('fetch/fetch.php');
+                const response = await fetch('../fetch/fetch.php');
                 const data = await response.json();
 
                 console.log(data); // Debug: Check the structure of the response
 
-                // Update the camera feed
                 const cameraFeed = document.getElementById('camera-feed');
                 cameraFeed.src = data.camera_feed;  // Directly update the camera feed URL
 
-                // Update the detection data
                 const latestDetection = data.latest_detection;
 
                 if (latestDetection !== 'No recent detection') {
-                    document.getElementById('session-id').textContent = latestDetection.session_id || 'N/A';
-                    document.getElementById('height-location').textContent = latestDetection.height_location || 'N/A';
-                    document.getElementById('detection-time').textContent = latestDetection.detection_time || 'N/A';
-                    document.getElementById('cancer-type').textContent = latestDetection.cancer_type || 'N/A';
+                    document.getElementById('session_id').textContent = latestDetection.session_id || 'N/A';
+                    document.getElementById('height_location').textContent = latestDetection.height_location || 'N/A';
+                    document.getElementById('detection_time').textContent = latestDetection.detection_time || 'N/A';
+                    document.getElementById('cancer_type').textContent = latestDetection.cancer_type || 'N/A';
                     document.getElementById('confidence').textContent = latestDetection.confidence || 'N/A';
-                    document.getElementById('detection-status').textContent = latestDetection.detection_status || 'N/A';
-                    document.getElementById('detection-image').src = latestDetection.image_path || '';
-                    document.getElementById('detection-image').alt = 'Latest detection image';
+                    document.getElementById('detection_status').textContent = latestDetection.detection_status || 'N/A';
+                    document.getElementById('detection_image').src = latestDetection.image_path || '';
+                    document.getElementById('detection_image').alt = 'Latest detection image';
                 } else {
-                    document.getElementById('session-id').textContent = 'No Data';
-                    document.getElementById('height-location').textContent = 'No Data';
-                    document.getElementById('detection-time').textContent = 'No Data';
-                    document.getElementById('cancer-type').textContent = 'No Data';
+                    document.getElementById('session_id').textContent = 'No Data';
+                    document.getElementById('height_location').textContent = 'No Data';
+                    document.getElementById('detection_time').textContent = 'No Data';
+                    document.getElementById('cancer_type').textContent = 'No Data';
                     document.getElementById('confidence').textContent = 'No Data';
-                    document.getElementById('detection-status').textContent = 'No Data';
-                    document.getElementById('detection-image').src = '';
-                    document.getElementById('detection-image').alt = 'No detection image available';
+                    document.getElementById('detection_status').textContent = 'No Data';
+                    document.getElementById('detection_image').src = '';
+                    document.getElementById('detection_image').alt = 'No detection image available';
                 }
             } catch (error) {
                 console.error('Failed to fetch data:', error);
             }
         }
 
-        // Fetch data every 2 seconds
         setInterval(fetchData, 2000);
-    </script>
-    <script>
+    
         async function fetchImageList() {
             try {
                 const response = await fetch('../fetch/fetch.php'); // Adjusted path to match your structure
@@ -209,14 +272,12 @@
                     const gallery = document.getElementById('gallery');
                     gallery.innerHTML = ''; // Clear any existing content
 
-                    // Create image elements for each image link
                     Object.values(imageList).forEach((imageUrl) => {
                         const imgElement = document.createElement('img');
                         imgElement.src = imageUrl; // Set the source to the image URL
                         imgElement.alt = 'Detected Image';
                         gallery.appendChild(imgElement);
 
-                        // Add click event to show the image in a modal
                         imgElement.addEventListener('click', () => {
                             const modal = document.getElementById('modal');
                             const modalImage = document.getElementById('modalImage');
@@ -232,7 +293,6 @@
             }
         }
 
-        // Close modal logic
         document.getElementById('closeModal').addEventListener('click', () => {
             document.getElementById('modal').classList.remove('open');
         });
@@ -243,7 +303,50 @@
             }
         });
 
-        // Fetch and display images on page load
+        fetchImageList();
+    </script>
+    <script>
+        async function fetchImageList() {
+            try {
+                const response = await fetch('../fetch/fetch.php'); // Adjusted path to match your structure
+                const data = await response.json();
+                const imageList = data.image_list;
+
+                if (imageList && Object.keys(imageList).length > 0) {
+                    const gallery = document.getElementById('gallery');
+                    gallery.innerHTML = ''; // Clear any existing content
+
+                    Object.values(imageList).forEach((imageUrl) => {
+                        const imgElement = document.createElement('img');
+                        imgElement.src = imageUrl; // Set the source to the image URL
+                        imgElement.alt = 'Detected Image';
+                        gallery.appendChild(imgElement);
+
+                        imgElement.addEventListener('click', () => {
+                            const modal = document.getElementById('modal');
+                            const modalImage = document.getElementById('modalImage');
+                            modalImage.src = imageUrl; // Show clicked image in modal
+                            modal.classList.add('open');
+                        });
+                    });
+                } else {
+                    console.error('No images found in image list.');
+                }
+            } catch (error) {
+                console.error('Error fetching image list:', error);
+            }
+        }
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('modal').classList.remove('open');
+        });
+
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('modal')) {
+                document.getElementById('modal').classList.remove('open');
+            }
+        });
+
         fetchImageList();
     </script>
 </body>
