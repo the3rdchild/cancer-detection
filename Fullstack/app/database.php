@@ -1,6 +1,6 @@
 <?php
 class Database {
-    private static $dbName = 'cancer-detection';
+    private static $dbName = 'cancer_detection';
     private static $dbHost = 'localhost';
     private static $dbUsername = 'root';
     private static $dbUserPassword = ''; 
